@@ -24,6 +24,5 @@ class Product {
     categoryId = int.parse((json['category_id'] ?? '0').toString());
     categoryName = (json['category_name'] ?? '').toString();
   }
-
   String get name => productName ?? '';
 }
