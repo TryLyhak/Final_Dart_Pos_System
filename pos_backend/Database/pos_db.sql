@@ -1,18 +1,17 @@
 CREATE DATABASE IF NOT EXISTS pos_db;
 USE pos_db;
 
--- ----------------------
+
 -- CATEGORIES TABLE
--- ----------------------
+
 CREATE TABLE categories (
     id       INT AUTO_INCREMENT PRIMARY KEY,
     category_name     VARCHAR(100) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- ----------------------
 -- USERS TABLE
--- ----------------------
+
 CREATE TABLE users (
     id         INT AUTO_INCREMENT PRIMARY KEY,
     user_name       VARCHAR(100) NOT NULL,
@@ -21,9 +20,8 @@ CREATE TABLE users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- ----------------------
 -- PRODUCTS TABLE
--- ----------------------
+
 CREATE TABLE products (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     product_name        VARCHAR(150) NOT NULL,
@@ -34,9 +32,9 @@ CREATE TABLE products (
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
--- ----------------------
+
 -- ORDERS TABLE
--- ----------------------
+
 CREATE TABLE orders (
     id         INT AUTO_INCREMENT PRIMARY KEY,
     user_id    INT NOT NULL,
@@ -46,9 +44,9 @@ CREATE TABLE orders (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- ----------------------
+
 -- ORDER ITEMS TABLE
--- ----------------------
+
 CREATE TABLE order_items (
     id         INT AUTO_INCREMENT PRIMARY KEY,
     order_id   INT NOT NULL,
@@ -60,9 +58,7 @@ CREATE TABLE order_items (
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- ============================================
 -- SEED DATA
--- ============================================
 
 -- Categories
 INSERT INTO categories (category_name) VALUES ('Electronics'), ('Food'), ('Clothing');

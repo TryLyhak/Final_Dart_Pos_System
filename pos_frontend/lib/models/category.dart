@@ -1,12 +1,14 @@
 class Category {
   int? id;
-  String? name;
+  String? categoryName;
 
-  Category({this.id, this.name});
+  Category({this.id, this.categoryName});
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(id: json['id'], name: json['name']);
+  Category.fromJson(Map<String, dynamic> json) {
+    id = int.parse((json['id'] ?? '0').toString());
+    categoryName = (json['category_name'] ?? '').toString();
   }
+  String get name => categoryName ?? '';
   @override
-  String toString() => 'Category(id: $id, name: $name)';
+  String toString() => '[$id] $categoryName';
 }

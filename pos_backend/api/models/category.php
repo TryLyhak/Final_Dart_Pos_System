@@ -9,7 +9,7 @@ class CategoryModel
     }
 
     // Implement category-related database operations here
-    public function getAllCategories(): array
+    public function getAll(): array
     {
         $result = $this->conn->query("SELECT id, category_name FROM categories ORDER BY id");
         $categories = [];
@@ -20,7 +20,7 @@ class CategoryModel
     }
 
     // Get category by ID
-    public function getCategoryById(int $id): ?array
+    public function getById(int $id): ?array
     {
         $stmt = $this->conn->prepare("SELECT id, category_name FROM categories WHERE id = ?");
         $stmt->bind_param("i", $id);
@@ -29,7 +29,7 @@ class CategoryModel
     }
 
     // Create a new category
-    public function createCategory(array $data): bool
+    public function create(array $data): bool
     {
         $stmt = $this->conn->prepare("INSERT INTO categories (category_name) VALUES (?)");
         $stmt->bind_param(
@@ -40,7 +40,7 @@ class CategoryModel
     }
 
     // Update an existing category
-    public function updateCategory(int $id, array $data): bool
+    public function update(int $id, array $data): bool
     {
         $stmt = $this->conn->prepare("UPDATE categories SET category_name = ? WHERE id = ?");
         $stmt->bind_param(
@@ -52,40 +52,11 @@ class CategoryModel
     }
 
     // Delete a category
-    public function deleteCategory(int $id): bool
+    public function delete(int $id): bool
     {
         $stmt = $this->conn->prepare("DELETE FROM categories WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         return $stmt->affected_rows > 0;
-    }
-
-    // Check if category name already exists (for create)
-    public function categoryExists(string $name): bool
-    {
-        $stmt = $this->conn->prepare("SELECT id FROM categories WHERE category_name = ?");
-        $stmt->bind_param("s", $name);
-        $stmt->execute();
-        return $stmt->get_result()->num_rows > 0;
-    }
-
-    // Check if category exists by ID (for update/delete)
-    public function categoryExistsById(int $id): bool
-    {
-        $stmt = $this->conn->prepare("SELECT id FROM categories WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        return $stmt->get_result()->num_rows > 0;
-    }
-
-    // Check if category has products before allowing deletion
-    public function hasProducts(int $id): bool
-    {
-        $stmt = $this->conn->prepare("SELECT COUNT(*) AS total FROM products WHERE category_id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
-        return $row['total'] > 0;
     }
 }

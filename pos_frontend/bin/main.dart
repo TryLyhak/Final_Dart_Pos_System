@@ -1,5 +1,6 @@
-import 'package:pos_frontend/app.dart' as pos_frontend;
+import 'package:pos_frontend/app.dart';
 
-void main(List<String> arguments) {
-  print('Hello world: ${pos_frontend.calculate()}!');
+void main() async {
+  final App app = App();
+  await app.startApp();
 }

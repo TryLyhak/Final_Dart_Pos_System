@@ -1,11 +1,16 @@
+// lib/utils/exceptions.dart
+
 class ApiException implements Exception {
   final String message;
-  final int statusscode;
+  final int statusCode; // ✅ fixed — was statusscode
 
-  const ApiException({required this.message, required this.statusscode});
+  const ApiException({
+    required this.message,
+    required this.statusCode, // ✅ fixed
+  });
 
   @override
-  String toString() => 'ApiException [$statusscode] :$message)';
+  String toString() => 'ApiException [$statusCode]: $message';
 }
 
 class AuthException implements Exception {

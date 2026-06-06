@@ -8,15 +8,8 @@ class CartItem {
   CartItem({required this.product, required this.quantity});
 
   // Calculated subtotal for this line item
-  double get subtotal => product.price! * quantity;
+  double get subtotal => (product.price ?? 0) * quantity;
 
-  // Display cart item in a formatted row
-  void printRow() {
-    print(
-      '  [${product.id.toString().padLeft(3)}] '
-      '${product.productName?.padRight(20)} '
-      'x$quantity  '
-      '\$${subtotal.toStringAsFixed(2)}',
-    );
-  }
+  // Display name
+  String get name => product.name;
 }

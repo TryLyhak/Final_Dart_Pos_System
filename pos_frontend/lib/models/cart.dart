@@ -1,88 +1,61 @@
 import 'package:pos_frontend/models/cart_item.dart';
 import 'package:pos_frontend/models/product.dart';
+import 'package:pos_frontend/utils/exceptions.dart';
 
 class Cart {
-  // Private list — only accessible through Cart methods
-  final List<CartItem> _items = [];
+  List<CartItem> items = [];
 
-  // Public read-only access to items
-  List<CartItem> get items => List.unmodifiable(_items);
-
-  // ── Add product or increase qty if already in cart ────────
+  // Add product to cart
   void addProduct({required Product product, required int quantity}) {
     final existing = _findById(product.id!);
     if (existing != null) {
-      // Product already in cart — just increase quantity
       existing.quantity += quantity;
     } else {
-      // New product — add to cart
-      _items.add(CartItem(product: product, quantity: quantity));
+      items.add(CartItem(product: product, quantity: quantity));
     }
   }
 
-  // ── Update quantity of an existing cart item ──────────────
+  // Update quantity
   void updateQuantity({required int productId, required int newQuantity}) {
     final item = _findById(productId);
-    if (item != null && newQuantity > 0) {
-      item.quantity = newQuantity;
+    if (item == null) {
+      throw ValidationException(
+        message: 'Product ID $productId is not in cart.',
+      );
     }
+    item.quantity = newQuantity;
   }
 
-  // ── Remove a specific product from cart ───────────────────
+  // Remove product from cart
   void removeProduct({required int productId}) {
-    _items.removeWhere((item) => item.product.id == productId);
-  }
-
-  // ── Clear all cart items ──────────────────────────────────
-  void clear() => _items.clear();
-
-  // ── Calculate grand total ─────────────────────────────────
-  double get total => _items.fold(0, (sum, item) => sum + item.subtotal);
-
-  // ── Check if cart is empty ────────────────────────────────
-  bool get isEmpty => _items.isEmpty;
-
-  // ── Check if cart has items ───────────────────────────────
-  bool get isNotEmpty => _items.isNotEmpty;
-
-  // ── Get item count ────────────────────────────────────────
-  int get itemCount => _items.length;
-
-  // ── Print all cart items in a formatted table ─────────────
-  void printCart() {
-    if (isEmpty) {
-      print('  Cart is empty.');
-      return;
+    final item = _findById(productId);
+    if (item == null) {
+      throw ValidationException(
+        message: 'Product ID $productId is not in cart.',
+      );
     }
-    print(
-      '  ${'ID'.padRight(6)}'
-      '${'Product'.padRight(22)}'
-      '${'Qty'.padRight(6)}'
-      'Subtotal',
-    );
-    print('  ${'─' * 42}');
-    for (final item in _items) {
-      item.printRow();
-    }
-    print('  ${'─' * 42}');
-    print('  TOTAL: \$${total.toStringAsFixed(2)}');
+    items.removeWhere((cartitem) => cartitem.product.id == productId);
   }
 
-  // ── Convert cart to API-ready JSON list for checkout ──────
-  List<Map<String, dynamic>> toOrderPayload() {
-    return _items
-        .map(
-          (item) => {'product_id': item.product.id, 'quantity': item.quantity},
-        )
-        .toList();
-  }
+  // Clear all items
+  void clear() => items.clear();
 
-  // ── Private helper — find CartItem by product ID ──────────
+  // Calculate grand total
+  double get total => items.fold(0, (sum, item) => sum + item.subtotal);
+
+  // Check if cart is empty
+  bool get isEmpty => items.isEmpty;
+
+  // Get item count
+  int get itemCount => items.length;
+
+  // Private helper — find item by product ID
   CartItem? _findById(int productId) {
-    try {
-      return _items.firstWhere((i) => i.product.id == productId);
-    } catch (_) {
-      return null;
+    for (final item in items) {
+      if (item.product.id == productId) {
+        return item;
+      }
     }
+    return null;
   }
 }

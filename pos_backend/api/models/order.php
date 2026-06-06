@@ -11,7 +11,7 @@ class OrderModel
     // get all orders
     public function getAllOrders(): array
     {
-        $result = $this->conn->query("SELECT id, user_id, total, created_at FROM orders ORDER BY id");
+        $result = $this->conn->query("SELECT id, user_id, total, status, created_at FROM orders ORDER BY id");
         $orders = [];
         while ($row = $result->fetch_assoc()) {
             $orders[] = $row;
@@ -19,18 +19,15 @@ class OrderModel
         return $orders;
     }
 
-    // get orders by user ID
-    public function getOrdersByUserId(int $userId): array
+    public function getOrderById(int $orderId): ?array
     {
-        $stmt = $this->conn->prepare("SELECT id, user_id, total, created_at FROM orders WHERE user_id = ?");
-        $stmt->bind_param("i", $userId);
+        $stmt = $this->conn->prepare(
+            "SELECT id, user_id, total, status, created_at FROM orders WHERE id = ?"
+        );
+        $stmt->bind_param("i", $orderId);
         $stmt->execute();
-        $result = $stmt->get_result();
-        $orders = [];
-        while ($row = $result->fetch_assoc()) {
-            $orders[] = $row;
-        }
-        return $orders;
+
+        return $stmt->get_result()->fetch_assoc();
     }
 
     // create a new order and return its ID
@@ -70,7 +67,7 @@ class OrderModel
     {
         $stmt = $this->conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param(
-            "iiddd",
+            "iiidd",
             $orderId,
             $data['product_id'],
             $data['quantity'],

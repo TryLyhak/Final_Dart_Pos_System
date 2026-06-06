@@ -7,31 +7,23 @@ class Product {
   int? stock;
 
   Product({
-    required this.id,
-    required this.categoryId,
-    required this.categoryName,
-    required this.productName,
-    required this.price,
-    required this.stock,
+    this.id,
+    this.categoryId,
+    this.categoryName,
+    this.productName,
+    this.price,
+    this.stock,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      categoryId: json['category_id'],
-      categoryName: json['category_name'],
-      productName: json['product_name'],
-      price: double.parse(json['price'].toString()),
-      stock: json['stock'],
-    );
+  // Factory constructor — converts JSON from API response
+  Product.fromJson(Map<String, dynamic> json) {
+    id = int.parse((json['id'] ?? '0').toString());
+    productName = (json['product_name'] ?? '').toString();
+    price = double.parse((json['price'] ?? '0').toString());
+    stock = int.parse((json['stock'] ?? '0').toString());
+    categoryId = int.parse((json['category_id'] ?? '0').toString());
+    categoryName = (json['category_name'] ?? '').toString();
   }
 
-  void printRow() {
-    print(
-      '[${id.toString().padRight(3)}] '
-      '[${productName?.padRight(20)}]'
-      '\$${price?.toStringAsFixed(2).padLeft(8)}'
-      'Stock: $stock',
-    );
-  }
+  String get name => productName ?? '';
 }
