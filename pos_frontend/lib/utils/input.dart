@@ -141,12 +141,21 @@ bool readYesNo({required String prompt}) {
   }
 }
 
-void printDivider() {
-  print('=' * 50);
-}
-
+// void printHeader(String title) {
+//   print('=' * 60);
+//   print(title.toUpperCase());
+//   print('=' * 60);
+// }
 void printHeader(String title) {
-  printDivider();
-  print(title.toUpperCase());
-  printDivider();
+  print('=' * 60);
+
+  // Convert to uppercase first
+  String upperTitle = title.toUpperCase();
+
+  // Calculate how much padding is needed on the left to center it
+  int leftPadding = ((60 + upperTitle.length) / 2).floor();
+
+  // padLeft brings it to the middle, then padRight fills the rest if needed
+  print(upperTitle.padLeft(leftPadding));
+  print('=' * 60);
 }

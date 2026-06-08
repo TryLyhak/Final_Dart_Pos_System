@@ -33,7 +33,7 @@ Future<void> showSaleMenu({
     print('  11. View Order History');
     print('  12. View Receipt');
     print('  0.  Logout');
-    printDivider();
+    print('=' * 60);
 
     final choice = readInt(prompt: '  Enter choice: ');
 
@@ -63,9 +63,9 @@ Future<void> showSaleMenu({
         case 8:
           _clearCart(cart);
           break;
-        case 9:
-          _calculateTotal(tableView, cart);
-          break;
+        // case 9:
+        //   _calculateTotal(tableView, cart);
+        //   break;
         case 10:
           await _checkout(productService, tableView, authService, cart);
           break;
@@ -111,13 +111,12 @@ Future<void> _viewProductDetails(
 ) async {
   final id = readInt(prompt: '  Enter Product ID: ', min: 1);
   final p = await productService.getProductById(id: id);
-
   printHeader('PRODUCT DETAILS');
   tableView.printTable(
     ['Field', 'Value'],
     [
       ['ID', p.id.toString()],
-      ['Name', p.name],
+      ['Product Name', p.name],
       ['Category', p.categoryName ?? ''],
       ['Price', '\$${p.price?.toStringAsFixed(2)}'],
       ['Stock', p.stock.toString()],
@@ -133,7 +132,6 @@ Future<void> _searchProducts(
 ) async {
   final keyword = readString(prompt: '  Search keyword: ');
   final products = await productService.searchProducts(keyword: keyword);
-
   printHeader('SEARCH RESULTS — "$keyword"');
   tableView.displayProducts(products);
 }
@@ -145,10 +143,8 @@ Future<void> _addToCart(
   Cart cart,
 ) async {
   await _displayAllProducts(productService, tableView);
-
   final id = readInt(prompt: '\n  Product ID to add : ', min: 1);
   final qty = readInt(prompt: '  Quantity          : ', min: 1);
-
   final product = await productService.getProductById(id: id);
 
   // ✅ Dart validates stock
@@ -157,11 +153,8 @@ Future<void> _addToCart(
       message: 'Not enough stock. Available: ${product.stock}',
     );
   }
-
   // ✅ Add to local cart — no API call!
   cart.addProduct(product: product, quantity: qty);
-
-  // Show confirmation
   tableView.printTable(
     ['Product', 'Qty', 'Unit Price', 'Subtotal'],
     [
@@ -221,9 +214,7 @@ void _clearCart(Cart cart) {
     print('  ⚠ Cart is already empty.');
     return;
   }
-
   final confirm = readYesNo(prompt: '  Clear entire cart?');
-
   if (confirm) {
     cart.clear();
     print('  ✅ Cart cleared successfully.');
@@ -233,38 +224,35 @@ void _clearCart(Cart cart) {
 }
 
 // 9. Calculate Total
-void _calculateTotal(TableView tableView, Cart cart) {
-  printHeader('CALCULATE TOTAL');
+// void _calculateTotal(TableView tableView, Cart cart) {
+//   printHeader('CALCULATE TOTAL');
+//   if (cart.isEmpty) {
+//     print('  ⚠ Cart is empty. Add items first.');
+//     return;
+//   }
+//   tableView.printTable(
+//     ['Product Name', 'Unit Price', 'Qty', 'Subtotal'],
+//     cart.items
+//         .map(
+//           (item) => [
+//             item.product.name,
+//             '\$${item.product.price?.toStringAsFixed(2)}',
+//             item.quantity.toString(),
+//             '\$${item.subtotal.toStringAsFixed(2)}',
+//           ],
+//         )
+//         .toList(),
+//     numericColumns: [false, true, true, true],
+//   );
 
-  if (cart.isEmpty) {
-    print('  ⚠ Cart is empty. Add items first.');
-    return;
-  }
-
-  // Show itemized table
-  tableView.printTable(
-    ['Product Name', 'Unit Price', 'Qty', 'Subtotal'],
-    cart.items
-        .map(
-          (item) => [
-            item.product.name,
-            '\$${item.product.price?.toStringAsFixed(2)}',
-            item.quantity.toString(),
-            '\$${item.subtotal.toStringAsFixed(2)}',
-          ],
-        )
-        .toList(),
-    numericColumns: [false, true, true, true],
-  );
-
-  // ✅ Show total — Dart calculates!
-  print('\n  ┌─────────────────────────────────┐');
-  print('  │  Items  : ${cart.itemCount.toString().padLeft(10)}           │');
-  print(
-    '  │  TOTAL  : \$${cart.total.toStringAsFixed(2).padLeft(9)}           │',
-  );
-  print('  └─────────────────────────────────┘');
-}
+//   // ✅ Show total — Dart calculates!
+//   print('\n  ┌─────────────────────────────────┐');
+//   print('  │  Items  : ${cart.itemCount.toString().padLeft(10)}           │');
+//   print(
+//     '  │  TOTAL  : \$${cart.total.toStringAsFixed(2).padLeft(9)}           │',
+//   );
+//   print('  └─────────────────────────────────┘');
+// }
 
 // 10. Checkout
 Future<void> _checkout(
@@ -274,8 +262,6 @@ Future<void> _checkout(
   Cart cart,
 ) async {
   printHeader('CHECKOUT SUMMARY');
-
-  // Show cart
   tableView.printTable(
     ['Product Name', 'Unit Price', 'Qty', 'Subtotal'],
     cart.items
@@ -290,7 +276,6 @@ Future<void> _checkout(
         .toList(),
     numericColumns: [false, true, true, true],
   );
-
   print('\n  Items : ${cart.itemCount}');
   print('  Total : \$${cart.total.toStringAsFixed(2)}');
 
@@ -301,16 +286,11 @@ Future<void> _checkout(
   }
 
   print('\n  Processing order...');
-
-  // ✅ Send cart + user_id to API — no token!
   final result = await productService.checkout(
     cart: cart,
     userId: authService.currentUser!.id!,
   );
-
-  // ✅ Clear local cart after successful order
   cart.clear();
-
   printHeader('✅ ORDER PLACED SUCCESSFULLY');
   tableView.printTable(
     ['Field', 'Value'],
@@ -330,7 +310,6 @@ Future<void> _viewOrderHistory(
 ) async {
   print('\n  Fetching order history...');
   final orders = await productService.getAllOrders();
-
   printHeader('ORDER HISTORY');
   tableView.displayOrders(orders);
 }
@@ -342,7 +321,6 @@ Future<void> _viewReceipt(
 ) async {
   final id = readInt(prompt: '  Enter Order ID: ');
   final order = await productService.getOrderReceipt(orderId: id);
-
   printHeader('RECEIPT — Order #${order.id}');
   tableView.displayReceipt(order);
 }

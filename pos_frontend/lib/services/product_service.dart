@@ -16,9 +16,7 @@ class ProductService {
   // ✅ Local list — matches teacher's sample style!
   List<Product> products = [];
 
-  // ══════════════════════════════════════════════
   // PRODUCT METHODS
-  // ══════════════════════════════════════════════
 
   // Get all products
   Future<List<Product>> getAllProducts() async {
@@ -126,7 +124,6 @@ class ProductService {
     if (id <= 0) {
       throw ValidationException(message: 'Invalid product ID.');
     }
-
     try {
       await _apiService.delete('/products?id=$id');
     } on ApiException {
@@ -134,37 +131,9 @@ class ProductService {
     }
   }
 
-  // Manage stock
-  Future<void> manageStock({
-    required int id,
-    required String productName,
-    required double price,
-    required int newStock,
-    required int categoryId,
-  }) async {
-    validateId(id, fieldName: 'Product ID');
-    validateRequiredText(productName, fieldName: 'Product name');
-    validatePositiveDouble(price, fieldName: 'Product price');
-    validateNonNegativeInt(newStock, fieldName: 'Stock quantity');
-    validateId(categoryId, fieldName: 'Category ID');
-
-    try {
-      await _apiService.put('/products?id=$id', {
-        'product_name': productName,
-        'price': price,
-        'stock': newStock,
-        'category_id': categoryId,
-      });
-    } on ApiException {
-      rethrow;
-    }
-  }
-
-  // ══════════════════════════════════════════════
   // CATEGORY METHODS
-  // ══════════════════════════════════════════════
 
-  // ── Get all categories ─────────────────────
+  // Get all categories
   Future<List<Category>> getAllCategories() async {
     try {
       final response = await _apiService.get('/categories');
@@ -177,9 +146,7 @@ class ProductService {
     }
   }
 
-  // ══════════════════════════════════════════════
   // ORDER METHODS
-  // ══════════════════════════════════════════════
 
   // ── Checkout — submit cart to API ──────────
   Future<Map<String, dynamic>> checkout({
@@ -190,7 +157,6 @@ class ProductService {
       throw ValidationException(message: 'Cart cannot be empty.');
     }
     validateId(userId, fieldName: 'User ID');
-
     final items = cart.items.map((item) {
       final productId = item.product.id;
       if (productId == null) {
@@ -201,20 +167,18 @@ class ProductService {
 
       return {'product_id': productId, 'quantity': item.quantity};
     }).toList();
-
     try {
       final response = await _apiService.post('/orders', {
         'user_id': userId,
         'items': items,
       });
-
       return response['data'] as Map<String, dynamic>;
     } on ApiException {
       rethrow;
     }
   }
 
-  // ── Get all orders ─────────────────────────
+  // Get all orders
   Future<List<Order>> getAllOrders() async {
     try {
       final response = await _apiService.get('/orders');
@@ -233,7 +197,6 @@ class ProductService {
     if (orderId <= 0) {
       throw ValidationException(message: 'Invalid order ID.');
     }
-
     try {
       final response = await _apiService.get('/orders?id=$orderId');
       return Order.fromJson(response['data'] as Map<String, dynamic>);

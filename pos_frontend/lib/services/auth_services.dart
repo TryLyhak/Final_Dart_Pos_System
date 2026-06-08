@@ -28,7 +28,6 @@ class AuthService {
     if (password.trim().isEmpty) {
       throw ValidationException(message: 'Password is required.');
     }
-
     try {
       final response = await _apiService.post('/login', {
         'username': username.trim(),

@@ -1,7 +1,6 @@
 CREATE DATABASE IF NOT EXISTS pos_db;
 USE pos_db;
 
-
 -- CATEGORIES TABLE
 
 CREATE TABLE categories (
@@ -31,7 +30,6 @@ CREATE TABLE products (
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
-
 
 -- ORDERS TABLE
 
@@ -65,9 +63,10 @@ INSERT INTO categories (category_name) VALUES ('Electronics'), ('Food'), ('Cloth
 
 -- Users (plaintext passwords for dev only; change to hashed passwords in production)
 INSERT INTO users (user_name, password, role) VALUES
-('Admin User','123', 'admin'),
-('Sale User','123', 'sale'),
-('Lyhak Try','123', 'sale');
+('Hak Zin2','123', 'admin'),
+('AhTha nheanSex','123', 'sale'),
+('AhVid kdorToch','123', 'sale'),
+('AhHeang kdorThom','123', 'admin');
 
 
 
@@ -85,8 +84,8 @@ SELECT * FROM users;
 SELECT * FROM orders;
 SELECT * FROM order_items;
 
-DROP TABLE categories;
-DROP TABLE products;
-DROP TABLE users;
-DROP TABLE orders;
-DROP TABLE order_items;
+-- DROP TABLE categories;
+-- DROP TABLE products;
+-- DROP TABLE users;
+-- DROP TABLE orders;
+-- DROP TABLE order_items;

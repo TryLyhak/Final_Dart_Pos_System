@@ -1,7 +1,4 @@
 class TableView {
-  // ══════════════════════════════════════════════
-  // CORE UTILITY: DYNAMIC UNICODE GRID PRINTER
-  // ══════════════════════════════════════════════
   void printTable(
     List<String> headers,
     List<List<String?>> rows, {
@@ -59,11 +56,9 @@ class TableView {
     print('\x1B[90m$bottomBorder\x1B[0m');
   }
 
-  // ══════════════════════════════════════════════
   // UI VIEW METHODS
-  // ══════════════════════════════════════════════
 
-  // ── Display products table with color-coded stock alerts ─────────────────
+  // Display products table with color-coded stock alerts
   void displayProducts(List<dynamic> products) {
     final List<List<String>> formattedRows = [];
 
@@ -96,7 +91,7 @@ class TableView {
     );
   }
 
-  // ── Display categories table ───────────────
+  // Display categories table
   void displayCategories(List<dynamic> categories) {
     printTable(
       ['ID', 'Category Name'],
@@ -105,7 +100,7 @@ class TableView {
     );
   }
 
-  // ── Display orders table with colored statuses ───────────────────
+  // Display orders table with colored statuses
   void displayOrders(List<dynamic> orders) {
     final List<List<String>> formattedRows = [];
 
@@ -136,7 +131,7 @@ class TableView {
     );
   }
 
-  // ── Display cart table with a neat cash tabulation section ─────────────────────
+  // Display cart table with a neat cash tabulation section
   void displayCart(dynamic cart) {
     if (cart.isEmpty) {
       print('\n  \x1B[90m[ Your shopping cart is empty ]\x1B[0m\n');
@@ -166,7 +161,7 @@ class TableView {
     );
   }
 
-  // ── Display receipt as a realistic point-of-sale voucher slip ───────────────────
+  // Display receipt as a realistic point-of-sale voucher slip
   void displayReceipt(dynamic order) {
     if (order == null) {
       print('\n\x1B[31m[!] Error: Cannot display empty order record.\x1B[0m\n');
@@ -174,9 +169,9 @@ class TableView {
     }
 
     // 1. Receipt Outer Frame Header
-    print('\n=======================================================');
-    print('                      OFFICIAL RECEIPT                 ');
-    print('=======================================================');
+    // print('\n=======================================================');
+    // print('                      OFFICIAL RECEIPT                 ');
+    // print('=======================================================');
 
     // 2. Order Meta Information Block
     print('  Order Reference : #${order.id.toString().padRight(10)}');
@@ -230,9 +225,7 @@ class TableView {
     print('=======================================================\n');
   }
 
-  // ══════════════════════════════════════════════
   // INTERNAL PRIVATE HELPER LOGIC
-  // ══════════════════════════════════════════════
 
   // Safely calculates the visible width of text, completely ignoring invisible ANSI escape codes
   int _getVisualLength(String text) {

@@ -26,7 +26,7 @@ Future<void> showAdminMenu({
     print('  8.  View All Categories');
     print('  9.  View All Orders');
     print('  0.  Logout');
-    printDivider();
+    print('=' * 60);
 
     final choice = readInt(prompt: '  Enter choice: ');
 
@@ -76,7 +76,7 @@ Future<void> showAdminMenu({
   }
 }
 
-// ── 1. Display All Products ────────────────────────────────
+// 1. Display All Products
 Future<void> _displayAllProducts(
   ProductService productService,
   TableView tableView,
@@ -88,7 +88,7 @@ Future<void> _displayAllProducts(
   tableView.displayProducts(products);
 }
 
-// ── 2. View Product Details ────────────────────────────────
+// 2. View Product Details
 Future<void> _viewProductDetails(
   ProductService productService,
   TableView tableView,
@@ -101,7 +101,7 @@ Future<void> _viewProductDetails(
     ['Field', 'Value'],
     [
       ['ID', p.id.toString()],
-      ['Name', p.name],
+      ['Product Name', p.name],
       ['Category', p.categoryName ?? ''],
       ['Price', '\$${p.price?.toStringAsFixed(2)}'],
       ['Stock', p.stock.toString()],
@@ -110,7 +110,7 @@ Future<void> _viewProductDetails(
   );
 }
 
-// ── 3. Search Products ─────────────────────────────────────
+// 3. Search Products
 Future<void> _searchProducts(
   ProductService productService,
   TableView tableView,
@@ -122,7 +122,7 @@ Future<void> _searchProducts(
   tableView.displayProducts(products);
 }
 
-// ── 4. Add New Product ─────────────────────────────────────
+// 4. Add New Product
 Future<void> _addProduct(
   ProductService productService,
   TableView tableView,
@@ -140,7 +140,7 @@ Future<void> _addProduct(
   tableView.printTable(
     ['Field', 'Value'],
     [
-      ['Name', productName],
+      ['Product Name', productName],
       ['Price', '\$${price.toStringAsFixed(2)}'],
       ['Stock', stock.toString()],
     ],
@@ -162,7 +162,7 @@ Future<void> _addProduct(
   print('  ✅ Product "$productName" added successfully!');
 }
 
-// ── 5. Update Product ──────────────────────────────────────
+// 5. Update Product
 Future<void> _updateProduct(
   ProductService productService,
   TableView tableView,
@@ -177,7 +177,7 @@ Future<void> _updateProduct(
     ['Field', 'Current Value'],
     [
       ['ID', p.id.toString()],
-      ['Name', p.name],
+      ['Product Name', p.name],
       ['Category', p.categoryName ?? ''],
       ['Price', '\$${p.price?.toStringAsFixed(2)}'],
       ['Stock', p.stock.toString()],
@@ -193,26 +193,26 @@ Future<void> _updateProduct(
     min: 1,
   );
   final productName = readString(prompt: '  New Name        [${p.name}] : ');
-  final price = readDouble(prompt: '  New Price       [${p.price}] \$ : ', min: 0.01);
+  final price = readDouble(
+    prompt: '  New Price       [${p.price}] \$ : ',
+    min: 0.01,
+  );
   final stock = readInt(prompt: '  New Stock       [${p.stock}] : ', min: 0);
-
   printHeader('CONFIRM UPDATE');
   tableView.printTable(
     ['Field', 'New Value'],
     [
-      ['Name', productName],
+      ['Product Name', productName],
       ['Price', '\$${price.toStringAsFixed(2)}'],
       ['Stock', stock.toString()],
     ],
     numericColumns: [false, false],
   );
-
   final confirm = readYesNo(prompt: '  Confirm update?');
   if (!confirm) {
     print('  Cancelled.');
     return;
   }
-
   await productService.updateProduct(
     id: id,
     productName: productName,
@@ -223,85 +223,76 @@ Future<void> _updateProduct(
   print('  ✅ Product updated successfully!');
 }
 
-// ── 6. Delete Product ──────────────────────────────────────
+// 6. Delete Product
 Future<void> _deleteProduct(
   ProductService productService,
   TableView tableView,
 ) async {
   final id = readInt(prompt: '  Enter Product ID to delete: ', min: 1);
   final p = await productService.getProductById(id: id);
-
   printHeader('DELETE PRODUCT');
   tableView.printTable(
     ['Field', 'Value'],
     [
       ['ID', p.id.toString()],
-      ['Name', p.name],
+      ['Product Name', p.name],
       ['Price', '\$${p.price?.toStringAsFixed(2)}'],
       ['Stock', p.stock.toString()],
     ],
     numericColumns: [false, false],
   );
-
   final confirm = readYesNo(prompt: '  Confirm delete?');
   if (!confirm) {
     print('  Cancelled.');
     return;
   }
-
   await productService.deleteProduct(id: id);
   print('  ✅ Product "${p.name}" deleted successfully!');
 }
 
-// ── 7. Manage Stock ────────────────────────────────────────
+// 7. Manage Stock
 Future<void> _manageStock(
   ProductService productService,
   TableView tableView,
 ) async {
   printHeader('MANAGE STOCK');
   await _displayAllProducts(productService, tableView);
-
   final id = readInt(prompt: '\n  Enter Product ID : ', min: 1);
   final p = await productService.getProductById(id: id);
-
   print('\n  Product       : ${p.name}');
   print('  Current Stock : ${p.stock}');
-
   final newStock = readInt(prompt: '  New Stock Qty  : ', min: 0);
   final confirm = readYesNo(prompt: '  Confirm stock update?');
   if (!confirm) {
     print('  Cancelled.');
     return;
   }
-
-  await productService.manageStock(
+  await productService.updateProduct(
     id: p.id!,
     productName: p.name,
     price: p.price ?? 0,
-    newStock: newStock,
+    stock: newStock,
     categoryId: p.categoryId ?? 1,
   );
   print('  ✅ Stock updated to $newStock successfully!');
 }
 
-// ── 8. View All Categories ─────────────────────────────────
+// 8. View All Categories
 Future<void> _viewAllCategories(
   ProductService productService,
   TableView tableView,
 ) async {
   final categories = await productService.getAllCategories();
-
   printHeader('CATEGORIES');
   tableView.displayCategories(categories);
 }
 
-// ── 9. View All Orders ─────────────────────────────────────
+// 9. View All Orders
 Future<void> _viewAllOrders(
   ProductService productService,
   TableView tableView,
 ) async {
   final orders = await productService.getAllOrders();
-
   printHeader('ALL ORDERS');
   tableView.displayOrders(orders);
 }

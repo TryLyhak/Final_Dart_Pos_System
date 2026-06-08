@@ -13,7 +13,6 @@ class AuthController
         $conn          = $db->connect();
         $this->userModel = new UserModel($conn);
     }
-
     // POST /login — verify credentials + return token
     public function login(): void
     {
