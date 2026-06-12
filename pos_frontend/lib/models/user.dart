@@ -19,6 +19,4 @@ class User {
   bool get isAdmin => role == UserRole.admin;
   bool get isSale => role == UserRole.sale;
 
-  // Display name
-  String get name => username ?? '';
 }

@@ -1,6 +1,6 @@
 import 'package:pos_frontend/models/cart_item.dart';
 import 'package:pos_frontend/models/product.dart';
-import 'package:pos_frontend/utils/exceptions.dart';
+import 'package:pos_frontend/helpers/exceptions.dart';
 
 class Cart {
   List<CartItem> items = [];

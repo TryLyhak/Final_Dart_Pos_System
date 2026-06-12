@@ -29,8 +29,6 @@ class OrderModel
 
         return $stmt->get_result()->fetch_assoc();
     }
-
-    // create a new order and return its ID
     public function createOrder(array $data): int
     {
         $stmt = $this->conn->prepare("INSERT INTO orders (user_id, total) VALUES (?, ?)");
@@ -43,14 +41,12 @@ class OrderModel
         return (int) $this->conn->insert_id;
     }
 
-    // get order items for a specific order
     public function getOrderItems(int $orderId): array
     {
         $stmt = $this->conn->prepare(
-            "SELECT oi.id, oi.product_id, oi.quantity, oi.unit_price, oi.subtotal, p.product_name
-             FROM order_items oi
-             JOIN products p ON oi.product_id = p.id
-             WHERE oi.order_id = ?"
+            "SELECT id, order_id, product_id, product_name, quantity, unit_price, subtotal
+             FROM order_items
+             WHERE order_id = ?"
         );
         $stmt->bind_param("i", $orderId);
         $stmt->execute();
@@ -62,14 +58,14 @@ class OrderModel
         return $items;
     }
 
-    // add an item to an order
     public function addOrderItem(int $orderId, array $data): bool
     {
-        $stmt = $this->conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $this->conn->prepare("INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param(
-            "iiidd",
+            "iisidd",
             $orderId,
             $data['product_id'],
+            $data['product_name'],
             $data['quantity'],
             $data['unit_price'],
             $data['subtotal']
@@ -77,7 +73,6 @@ class OrderModel
         return $stmt->execute();
     }
 
-    // Get the database connection (for transaction management in controller)
     public function getConn()
     {
         return $this->conn;

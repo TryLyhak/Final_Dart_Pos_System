@@ -79,10 +79,11 @@ class OrderController
 
                 // Save the data for the insertion loop
                 $validatedProducts[] = [
-                    'product_id' => $productId,
-                    'quantity'   => $quantity,
-                    'unit_price' => $price,
-                    'subtotal'   => $price * $quantity
+                    'product_id'   => $productId,
+                    'product_name' => $product['product_name'],
+                    'quantity'     => $quantity,
+                    'unit_price'   => $price,
+                    'subtotal'     => $price * $quantity
                 ];
             }
 
@@ -95,10 +96,11 @@ class OrderController
             // Loop 3: Process insertion and stock deduction instantly from cache
             foreach ($validatedProducts as $p) {
                 $this->orderModel->addOrderItem($orderId, [
-                    'product_id' => $p['product_id'],
-                    'quantity'   => $p['quantity'],
-                    'unit_price' => $p['unit_price'],
-                    'subtotal'   => $p['subtotal']
+                    'product_id'   => $p['product_id'],
+                    'product_name' => $p['product_name'],
+                    'quantity'     => $p['quantity'],
+                    'unit_price'   => $p['unit_price'],
+                    'subtotal'     => $p['subtotal']
                 ]);
 
                 $this->productModel->deductStock($p['product_id'], $p['quantity']);

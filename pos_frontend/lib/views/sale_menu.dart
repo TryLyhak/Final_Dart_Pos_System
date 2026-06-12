@@ -1,9 +1,9 @@
 import 'package:pos_frontend/models/cart.dart';
 import 'package:pos_frontend/services/auth_services.dart';
 import 'package:pos_frontend/services/product_service.dart';
-import 'package:pos_frontend/utils/input.dart';
-import 'package:pos_frontend/utils/exceptions.dart';
-import 'package:pos_frontend/utils/table_view.dart';
+import 'package:pos_frontend/helpers/input.dart';
+import 'package:pos_frontend/helpers/exceptions.dart';
+import 'package:pos_frontend/helpers/table_view.dart';
 
 // Sale Menu — handles all sale features + local cart
 // Receives instances from App class
@@ -15,7 +15,7 @@ Future<void> showSaleMenu({
 }) async {
   final name = authService.currentName;
 
-  // ✅ Local cart — lives in memory only!
+  //  Local cart — lives in memory only!
   final cart = Cart();
 
   while (true) {
@@ -28,15 +28,12 @@ Future<void> showSaleMenu({
     print('  6.  Update Cart Quantity');
     print('  7.  Remove from Cart');
     print('  8.  Clear Cart');
-    print('  9.  Calculate Total');
-    print('  10. Checkout');
-    print('  11. View Order History');
-    print('  12. View Receipt');
+    print('  9.  Checkout');
+    print('  10. View Order History');
+    print('  11. View Receipt');
     print('  0.  Logout');
-    print('=' * 60);
-
+    print('=' * 55);
     final choice = readInt(prompt: '  Enter choice: ');
-
     try {
       switch (choice) {
         case 1:
@@ -63,29 +60,28 @@ Future<void> showSaleMenu({
         case 8:
           _clearCart(cart);
           break;
-        // case 9:
-        //   _calculateTotal(tableView, cart);
-        //   break;
-        case 10:
+        case 9:
           await _checkout(productService, tableView, authService, cart);
           break;
-        case 11:
+        case 10:
           await _viewOrderHistory(productService, tableView);
           break;
-        case 12:
+        case 11:
           await _viewReceipt(productService, tableView);
           break;
         case 0:
           await authService.logout();
-          print('\n  ✅ Logged out successfully. Goodbye, $name!\n');
+          print(
+            '\n   Logged out successfully. Goodbye, \x1B[31m$name\x1B[0m!\n',
+          );
           return;
         default:
-          print('  ⚠ Invalid option. Please try again.');
+          print('   Invalid option. Please try again.');
       }
     } on ValidationException catch (e) {
-      print('  ⚠ Validation: ${e.message}');
+      print('   Validation: ${e.message}');
     } on ApiException catch (e) {
-      print(' API Error: ${e.message}');
+      print('   API Error: ${e.message}');
     } catch (e) {
       print(' Unexpected error: $e');
     }
@@ -99,7 +95,6 @@ Future<void> _displayAllProducts(
 ) async {
   print('\n  Fetching products...');
   final products = await productService.getAllProducts();
-
   printHeader('AVAILABLE PRODUCTS');
   tableView.displayProducts(products);
 }
@@ -116,7 +111,7 @@ Future<void> _viewProductDetails(
     ['Field', 'Value'],
     [
       ['ID', p.id.toString()],
-      ['Product Name', p.name],
+      ['Product Name', p.productName ?? ''],
       ['Category', p.categoryName ?? ''],
       ['Price', '\$${p.price?.toStringAsFixed(2)}'],
       ['Stock', p.stock.toString()],
@@ -147,19 +142,19 @@ Future<void> _addToCart(
   final qty = readInt(prompt: '  Quantity          : ', min: 1);
   final product = await productService.getProductById(id: id);
 
-  // ✅ Dart validates stock
+  //  Dart validates stock
   if (qty > (product.stock ?? 0)) {
     throw ValidationException(
       message: 'Not enough stock. Available: ${product.stock}',
     );
   }
-  // ✅ Add to local cart — no API call!
+  //  Add to local cart — no API call!
   cart.addProduct(product: product, quantity: qty);
   tableView.printTable(
     ['Product', 'Qty', 'Unit Price', 'Subtotal'],
     [
       [
-        product.name,
+        product.productName,
         qty.toString(),
         '\$${product.price?.toStringAsFixed(2)}',
         '\$${((product.price ?? 0) * qty).toStringAsFixed(2)}',
@@ -167,7 +162,7 @@ Future<void> _addToCart(
     ],
     numericColumns: [false, true, true, true],
   );
-  print('  ✅ Added to cart successfully!');
+  print('   Added to cart successfully!');
 }
 
 // 5. View Cart
@@ -179,82 +174,50 @@ void _viewCart(TableView tableView, Cart cart) {
 // 6. Update Cart Quantity
 void _updateCartQty(TableView tableView, Cart cart) {
   if (cart.isEmpty) {
-    print('  ⚠ Cart is empty. Add items first.');
+    print('   Cart is empty. Add items first.');
     return;
   }
 
   printHeader('UPDATE CART QUANTITY');
   tableView.displayCart(cart);
 
-  final id = readInt(prompt: '\n  Product ID to update : ', min: 1);
+  final id = readInt(prompt: '  Product ID to update : ', min: 1);
   final qty = readInt(prompt: '  New quantity         : ', min: 1);
 
   cart.updateQuantity(productId: id, newQuantity: qty);
-  print('  ✅ Quantity updated successfully.');
+  print('   Quantity updated successfully.');
 }
 
 // 7. Remove from Cart
 void _removeFromCart(TableView tableView, Cart cart) {
   if (cart.isEmpty) {
-    print('  ⚠ Cart is empty. Nothing to remove.');
+    print('   Cart is empty. Nothing to remove.');
     return;
   }
-
   printHeader('REMOVE FROM CART');
   tableView.displayCart(cart);
 
   final id = readInt(prompt: '\n  Product ID to remove : ', min: 1);
   cart.removeProduct(productId: id);
-  print('  ✅ Item removed from cart.');
+  print('   Item removed from cart.');
 }
 
 // 8. Clear Cart
 void _clearCart(Cart cart) {
   if (cart.isEmpty) {
-    print('  ⚠ Cart is already empty.');
+    print('   Cart is already empty.');
     return;
   }
   final confirm = readYesNo(prompt: '  Clear entire cart?');
   if (confirm) {
     cart.clear();
-    print('  ✅ Cart cleared successfully.');
+    print('   Cart cleared successfully.');
   } else {
     print('  Cancelled.');
   }
 }
 
-// 9. Calculate Total
-// void _calculateTotal(TableView tableView, Cart cart) {
-//   printHeader('CALCULATE TOTAL');
-//   if (cart.isEmpty) {
-//     print('  ⚠ Cart is empty. Add items first.');
-//     return;
-//   }
-//   tableView.printTable(
-//     ['Product Name', 'Unit Price', 'Qty', 'Subtotal'],
-//     cart.items
-//         .map(
-//           (item) => [
-//             item.product.name,
-//             '\$${item.product.price?.toStringAsFixed(2)}',
-//             item.quantity.toString(),
-//             '\$${item.subtotal.toStringAsFixed(2)}',
-//           ],
-//         )
-//         .toList(),
-//     numericColumns: [false, true, true, true],
-//   );
-
-//   // ✅ Show total — Dart calculates!
-//   print('\n  ┌─────────────────────────────────┐');
-//   print('  │  Items  : ${cart.itemCount.toString().padLeft(10)}           │');
-//   print(
-//     '  │  TOTAL  : \$${cart.total.toStringAsFixed(2).padLeft(9)}           │',
-//   );
-//   print('  └─────────────────────────────────┘');
-// }
-
-// 10. Checkout
+// 9. Checkout
 Future<void> _checkout(
   ProductService productService,
   TableView tableView,
@@ -267,7 +230,7 @@ Future<void> _checkout(
     cart.items
         .map(
           (item) => [
-            item.product.name,
+            item.product.productName,
             '\$${item.product.price?.toStringAsFixed(2)}',
             item.quantity.toString(),
             '\$${item.subtotal.toStringAsFixed(2)}',
@@ -277,7 +240,7 @@ Future<void> _checkout(
     numericColumns: [false, true, true, true],
   );
   print('\n  Items : ${cart.itemCount}');
-  print('  Total : \$${cart.total.toStringAsFixed(2)}');
+  print('  Total : \x1B[1m\x1B[32m\$${cart.total.toStringAsFixed(2)}\x1B[0m');
 
   final confirm = readYesNo(prompt: '  Confirm order?');
   if (!confirm) {
@@ -291,7 +254,7 @@ Future<void> _checkout(
     userId: authService.currentUser!.id!,
   );
   cart.clear();
-  printHeader('✅ ORDER PLACED SUCCESSFULLY');
+  printHeader(' ORDER PLACED SUCCESSFULLY');
   tableView.printTable(
     ['Field', 'Value'],
     [
@@ -303,7 +266,7 @@ Future<void> _checkout(
   );
 }
 
-// 11. View Order History
+// 10. View Order History
 Future<void> _viewOrderHistory(
   ProductService productService,
   TableView tableView,
@@ -314,7 +277,7 @@ Future<void> _viewOrderHistory(
   tableView.displayOrders(orders);
 }
 
-// 12. View Receipt
+// 11. View Receipt
 Future<void> _viewReceipt(
   ProductService productService,
   TableView tableView,

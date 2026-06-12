@@ -1,7 +1,7 @@
 import 'package:pos_frontend/enum/user_role.dart';
 import 'package:pos_frontend/models/user.dart';
 import 'package:pos_frontend/services/api_services.dart';
-import 'package:pos_frontend/utils/exceptions.dart';
+import 'package:pos_frontend/helpers/exceptions.dart';
 
 // AuthService — handles login/logout and current session
 
@@ -12,15 +12,13 @@ class AuthService {
   // Currently logged-in user — null if not logged in
   User? currentUser;
 
-  // ══════════════════════════════════════════════
   // LOGIN
-  // ══════════════════════════════════════════════
 
   Future<User> login({
     required String username,
     required String password,
   }) async {
-    // ✅ Dart handles input validation
+    // Dart handles input validation
     if (username.trim().isEmpty) {
       throw ValidationException(message: 'Username is required.');
     }
@@ -36,7 +34,7 @@ class AuthService {
 
       final data = response['data'] as Map<String, dynamic>;
 
-      // ✅ Parse user using factory constructor
+      // Parse user using factory constructor
       currentUser = User.fromJson(data['user'] as Map<String, dynamic>);
 
       return currentUser!;
@@ -45,24 +43,18 @@ class AuthService {
     }
   }
 
-  // ══════════════════════════════════════════════
   // LOGOUT
-  // ══════════════════════════════════════════════
 
   Future<void> logout() async {
     try {
       await _apiService.post('/logout', {});
     } catch (_) {
-      // Always clear session even if API call fails
     } finally {
-      // ✅ Clear current user
       currentUser = null;
     }
   }
 
-  // ══════════════════════════════════════════════
   // HELPERS
-  // ══════════════════════════════════════════════
 
   // Check if user is logged in
   bool get isLoggedIn => currentUser != null;
@@ -72,7 +64,7 @@ class AuthService {
   bool get isSale => currentUser?.role == UserRole.sale;
 
   // Get current user name
-  String get currentName => currentUser?.name ?? '';
+  String get currentName => currentUser?.username ?? '';
 
   // Get current role
   UserRole? get currentRole => currentUser?.role;

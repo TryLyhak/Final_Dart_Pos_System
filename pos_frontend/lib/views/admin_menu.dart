@@ -1,8 +1,8 @@
 import 'package:pos_frontend/services/auth_services.dart';
 import 'package:pos_frontend/services/product_service.dart';
-import 'package:pos_frontend/utils/input.dart';
-import 'package:pos_frontend/utils/exceptions.dart';
-import 'package:pos_frontend/utils/table_view.dart';
+import 'package:pos_frontend/helpers/input.dart';
+import 'package:pos_frontend/helpers/exceptions.dart';
+import 'package:pos_frontend/helpers/table_view.dart';
 
 // Admin Menu — handles all admin features
 // Receives instances from App class
@@ -15,7 +15,7 @@ Future<void> showAdminMenu({
   final name = authService.currentName;
 
   while (true) {
-    printHeader('ADMIN MENU — Welcome, $name');
+    printHeader('ADMIN MENU — Welcome, $name!');
     print('  1.  Display All Products');
     print('  2.  View Product Details');
     print('  3.  Search Products');
@@ -26,10 +26,9 @@ Future<void> showAdminMenu({
     print('  8.  View All Categories');
     print('  9.  View All Orders');
     print('  0.  Logout');
-    print('=' * 60);
+    print('=' * 55);
 
     final choice = readInt(prompt: '  Enter choice: ');
-
     try {
       switch (choice) {
         case 1:
@@ -61,17 +60,19 @@ Future<void> showAdminMenu({
           break;
         case 0:
           await authService.logout();
-          print('\n  ✅ Logged out successfully. Goodbye, $name!\n');
+          print(
+            '\n   Logged out successfully. Goodbye!, \x1B[31m$name\x1B[0m\n',
+          );
           return;
         default:
-          print('  ⚠ Invalid option. Please try again.');
+          print('   Invalid option. Please try again.');
       }
     } on ValidationException catch (e) {
-      print('  ⚠ Validation: ${e.message}');
+      print('   Validation: ${e.message}');
     } on ApiException catch (e) {
-      print('  ❌ API Error: ${e.message}');
+      print('   API Error: ${e.message}');
     } catch (e) {
-      print('  ❌ Unexpected error: $e');
+      print('   Unexpected error: $e');
     }
   }
 }
@@ -83,7 +84,6 @@ Future<void> _displayAllProducts(
 ) async {
   print('\n  Fetching products...');
   final products = await productService.getAllProducts();
-
   printHeader('PRODUCT LIST');
   tableView.displayProducts(products);
 }
@@ -95,13 +95,12 @@ Future<void> _viewProductDetails(
 ) async {
   final id = readInt(prompt: '  Enter Product ID: ', min: 1);
   final p = await productService.getProductById(id: id);
-
   printHeader('PRODUCT DETAILS');
   tableView.printTable(
     ['Field', 'Value'],
     [
       ['ID', p.id.toString()],
-      ['Product Name', p.name],
+      ['Product Name', p.productName ?? ''],
       ['Category', p.categoryName ?? ''],
       ['Price', '\$${p.price?.toStringAsFixed(2)}'],
       ['Stock', p.stock.toString()],
@@ -117,7 +116,6 @@ Future<void> _searchProducts(
 ) async {
   final keyword = readString(prompt: '  Search keyword: ');
   final products = await productService.searchProducts(keyword: keyword);
-
   printHeader('SEARCH RESULTS — "$keyword"');
   tableView.displayProducts(products);
 }
@@ -128,14 +126,11 @@ Future<void> _addProduct(
   TableView tableView,
 ) async {
   printHeader('ADD NEW PRODUCT');
-
   await _viewAllCategories(productService, tableView);
-
   final categoryId = readInt(prompt: '\n  Category ID  : ', min: 1);
   final productName = readString(prompt: '  Product Name : ');
   final price = readDouble(prompt: '  Price \$      : ', min: 0.01);
   final stock = readInt(prompt: '  Stock Qty    : ', min: 0);
-
   printHeader('CONFIRM NEW PRODUCT');
   tableView.printTable(
     ['Field', 'Value'],
@@ -146,20 +141,18 @@ Future<void> _addProduct(
     ],
     numericColumns: [false, false],
   );
-
   final confirm = readYesNo(prompt: '  Save product?');
   if (!confirm) {
     print('  Cancelled.');
     return;
   }
-
   await productService.createProduct(
     productName: productName,
     price: price,
     stock: stock,
     categoryId: categoryId,
   );
-  print('  ✅ Product "$productName" added successfully!');
+  print('   Product "$productName" added successfully!');
 }
 
 // 5. Update Product
@@ -169,30 +162,28 @@ Future<void> _updateProduct(
 ) async {
   final id = readInt(prompt: '  Enter Product ID to update: ', min: 1);
   final p = await productService.getProductById(id: id);
-
-  printHeader('UPDATE PRODUCT — ${p.name}');
-
+  printHeader('UPDATE PRODUCT — ${p.productName}');
   // Show current values
   tableView.printTable(
     ['Field', 'Current Value'],
     [
       ['ID', p.id.toString()],
-      ['Product Name', p.name],
+      ['Product Name', p.productName],
       ['Category', p.categoryName ?? ''],
       ['Price', '\$${p.price?.toStringAsFixed(2)}'],
       ['Stock', p.stock.toString()],
     ],
     numericColumns: [false, false],
   );
-
   // Show categories
   await _viewAllCategories(productService, tableView);
-
   final categoryId = readInt(
     prompt: '\n  New Category ID [${p.categoryId}] : ',
     min: 1,
   );
-  final productName = readString(prompt: '  New Name        [${p.name}] : ');
+  final productName = readString(
+    prompt: '  New Name        [${p.productName}] : ',
+  );
   final price = readDouble(
     prompt: '  New Price       [${p.price}] \$ : ',
     min: 0.01,
@@ -220,7 +211,7 @@ Future<void> _updateProduct(
     stock: stock,
     categoryId: categoryId,
   );
-  print('  ✅ Product updated successfully!');
+  print('   Product updated successfully!');
 }
 
 // 6. Delete Product
@@ -235,19 +226,19 @@ Future<void> _deleteProduct(
     ['Field', 'Value'],
     [
       ['ID', p.id.toString()],
-      ['Product Name', p.name],
+      ['Product Name', p.productName],
       ['Price', '\$${p.price?.toStringAsFixed(2)}'],
       ['Stock', p.stock.toString()],
     ],
     numericColumns: [false, false],
   );
-  final confirm = readYesNo(prompt: '  Confirm delete?');
+  final confirm = readYesNo(prompt: ' Confirm delete?');
   if (!confirm) {
     print('  Cancelled.');
     return;
   }
   await productService.deleteProduct(id: id);
-  print('  ✅ Product "${p.name}" deleted successfully!');
+  print('   Product "${p.productName}" deleted successfully!');
 }
 
 // 7. Manage Stock
@@ -259,7 +250,7 @@ Future<void> _manageStock(
   await _displayAllProducts(productService, tableView);
   final id = readInt(prompt: '\n  Enter Product ID : ', min: 1);
   final p = await productService.getProductById(id: id);
-  print('\n  Product       : ${p.name}');
+  print('\n  Product       : ${p.productName}');
   print('  Current Stock : ${p.stock}');
   final newStock = readInt(prompt: '  New Stock Qty  : ', min: 0);
   final confirm = readYesNo(prompt: '  Confirm stock update?');
@@ -269,12 +260,12 @@ Future<void> _manageStock(
   }
   await productService.updateProduct(
     id: p.id!,
-    productName: p.name,
+    productName: p.productName ?? '',
     price: p.price ?? 0,
     stock: newStock,
     categoryId: p.categoryId ?? 1,
   );
-  print('  ✅ Stock updated to $newStock successfully!');
+  print('   Stock updated to $newStock successfully!');
 }
 
 // 8. View All Categories

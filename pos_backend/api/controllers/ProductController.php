@@ -90,7 +90,11 @@ class ProductController
     // DELETE /products?id=X — delete product
     public function deleteProductById(): void
     {
-        $id     = (int) ($_GET['id'] ?? 0);
+        $id = (int) ($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            sendResponse(400, false, 'Invalid product ID.');
+        }
+
         $deleted = $this->productModel->delete($id);
 
         $deleted

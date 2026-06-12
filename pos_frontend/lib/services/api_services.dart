@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:pos_frontend/utils/exceptions.dart';
+import 'package:pos_frontend/helpers/exceptions.dart';
 
 class ApiService {
-  // ✅ Fixed base URL — matches your Laragon path
   final String _baseUrl = 'http://localhost/index.php';
-
   Map<String, String> _buildHeaders() {
     return {'Content-Type': 'application/json', 'Accept': 'application/json'};
   }
@@ -19,10 +17,7 @@ class ApiService {
           .timeout(const Duration(seconds: 10));
       return _handleResponse(response);
     } on http.ClientException catch (e) {
-      throw ApiException(
-        message: 'Network error: ${e.message}',
-        statusCode: 0, // ✅ fixed typo
-      );
+      throw ApiException(message: 'Network error: ${e.message}', statusCode: 0);
     }
   }
 
@@ -35,14 +30,11 @@ class ApiService {
           .timeout(const Duration(seconds: 10));
       return _handleResponse(response);
     } on http.ClientException catch (e) {
-      throw ApiException(
-        message: 'Network error: ${e.message}',
-        statusCode: 0, // ✅ fixed typo
-      );
+      throw ApiException(message: 'Network error: ${e.message}', statusCode: 0);
     }
   }
 
-  // ── PUT request ───────────────────────────────
+  // PUT request
   Future<dynamic> put(String endpoint, Map<String, dynamic> body) async {
     try {
       final url = Uri.parse('$_baseUrl$endpoint');
@@ -51,14 +43,11 @@ class ApiService {
           .timeout(const Duration(seconds: 10));
       return _handleResponse(response);
     } on http.ClientException catch (e) {
-      throw ApiException(
-        message: 'Network error: ${e.message}',
-        statusCode: 0, // ✅ fixed typo
-      );
+      throw ApiException(message: 'Network error: ${e.message}', statusCode: 0);
     }
   }
 
-  // ── DELETE request ────────────────────────────
+  // DELETE request
   Future<dynamic> delete(String endpoint) async {
     try {
       final url = Uri.parse('$_baseUrl$endpoint');
@@ -67,10 +56,7 @@ class ApiService {
           .timeout(const Duration(seconds: 10));
       return _handleResponse(response);
     } on http.ClientException catch (e) {
-      throw ApiException(
-        message: 'Network error: ${e.message}',
-        statusCode: 0, // ✅ fixed typo
-      );
+      throw ApiException(message: 'Network error: ${e.message}', statusCode: 0);
     }
   }
 

@@ -96,6 +96,17 @@ class ProductModel
         return $stmt->affected_rows > 0;
     }
 
+    // Check whether the product is referenced by any order items
+    public function hasOrderItems(int $id): bool
+    {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) AS total FROM order_items WHERE product_id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        return isset($row['total']) && (int) $row['total'] > 0;
+    }
+
     // Deduct stock for a product (used when creating an order)
     public function deductStock(int $id, int $quantity): bool
     {

@@ -22,10 +22,9 @@ class OrderItem {
     id = int.parse((json['id'] ?? '0').toString());
     orderId = int.parse((json['order_id'] ?? '0').toString());
     productId = int.parse((json['product_id'] ?? '0').toString());
-    productName = (json['product_name'] ?? '').toString();
+    productName = (json['product_name'] ?? 'Unknow Item').toString();
     quantity = int.parse((json['quantity'] ?? '0').toString());
     unitPrice = double.parse((json['unit_price'] ?? '0').toString());
     subtotal = double.parse((json['subtotal'] ?? '0').toString());
   }
-  String get name => productName ?? '';
 }

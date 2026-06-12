@@ -28,7 +28,7 @@ class Order {
     status = (json['status'] ?? '').toString();
     createdAt = (json['created_at'] ?? '').toString();
 
-    // ✅ Parse nested order items if present — receipt view
+    // Parse nested order items if present — receipt view
     final rawItems = json['items'] as List<dynamic>? ?? [];
     items = rawItems
         .map((item) => OrderItem.fromJson(item as Map<String, dynamic>))

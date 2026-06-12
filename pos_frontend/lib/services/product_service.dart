@@ -3,28 +3,28 @@ import 'package:pos_frontend/models/product.dart';
 import 'package:pos_frontend/models/cart.dart';
 import 'package:pos_frontend/models/order.dart';
 import 'package:pos_frontend/services/api_services.dart';
-import 'package:pos_frontend/utils/exceptions.dart';
-import 'package:pos_frontend/utils/input.dart';
+import 'package:pos_frontend/helpers/exceptions.dart';
+import 'package:pos_frontend/helpers/input.dart';
 
 // ProductService — handles ALL product, category and order API calls
 // Matches teacher's requirement — one service only!
 
 class ProductService {
-  // Instance of ApiService — matches teacher's style
+  // Instance of ApiService
   final ApiService _apiService = ApiService();
 
-  // ✅ Local list — matches teacher's sample style!
+  // Local list Products
   List<Product> products = [];
 
   // PRODUCT METHODS
 
-  // Get all products
+  // Function to get all products
   Future<List<Product>> getAllProducts() async {
     try {
       final response = await _apiService.get('/products');
       final list = response['data'] as List<dynamic>;
 
-      // ✅ Store in local list — matches teacher style!
+      //  Store in local list Products
       products = list
           .map((json) => Product.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -35,7 +35,7 @@ class ProductService {
     }
   }
 
-  //  Get single product by ID
+  // Function to get single product by ID
   Future<Product> getProductById({required int id}) async {
     validateId(id, fieldName: 'Product ID');
 
@@ -47,7 +47,7 @@ class ProductService {
     }
   }
 
-  // Search products
+  // Function to search products
   Future<List<Product>> searchProducts({required String keyword}) async {
     final query = validateSearchKeyword(keyword);
 
@@ -62,7 +62,7 @@ class ProductService {
     }
   }
 
-  // Create product
+  // Function to create product
   Future<void> createProduct({
     required String productName,
     required double price,
@@ -89,7 +89,7 @@ class ProductService {
     }
   }
 
-  // Update product
+  // Function to update product
   Future<void> updateProduct({
     required int id,
     required String productName,
@@ -118,9 +118,8 @@ class ProductService {
     }
   }
 
-  // Delete product
+  // Function to delete product
   Future<void> deleteProduct({required int id}) async {
-    // ✅ Dart validates ID
     if (id <= 0) {
       throw ValidationException(message: 'Invalid product ID.');
     }
@@ -133,7 +132,7 @@ class ProductService {
 
   // CATEGORY METHODS
 
-  // Get all categories
+  // Function to get all categories
   Future<List<Category>> getAllCategories() async {
     try {
       final response = await _apiService.get('/categories');
@@ -148,7 +147,7 @@ class ProductService {
 
   // ORDER METHODS
 
-  // ── Checkout — submit cart to API ──────────
+  // Checkout - Function to submit cart to API
   Future<Map<String, dynamic>> checkout({
     required Cart cart,
     required int userId,
@@ -193,7 +192,7 @@ class ProductService {
 
   // Get order receipt
   Future<Order> getOrderReceipt({required int orderId}) async {
-    // ✅ Dart validates ID
+    // Dart validates ID
     if (orderId <= 0) {
       throw ValidationException(message: 'Invalid order ID.');
     }

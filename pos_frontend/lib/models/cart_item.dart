@@ -10,6 +10,4 @@ class CartItem {
   // Calculated subtotal for this line item
   double get subtotal => (product.price ?? 0) * quantity;
 
-  // Display name
-  String get name => product.name;
 }
